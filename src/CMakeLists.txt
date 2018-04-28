@@ -14,12 +14,12 @@ foreach(problem ${SOURCES})
   string(REGEX REPLACE "euler-" "" base "${base}")
 
   # Create a run-time executable based on these source files from above.
-  add_executable(exec ${SOURCES})
+  add_executable(${base} ${problem})
 
   # Use C++14 to compile the source file.
   # Also build the .o executable file without any prefixes (e.g. 'bin').
   set_target_properties(
-    exec
+    ${base}
     PROPERTIES
       COMPILE_FLAGS            "-std=c++14 -O3"
       PREFIX                   ""
@@ -31,7 +31,7 @@ foreach(problem ${SOURCES})
   # resolved when the shared library is linked) on Mac OS X.
   if (APPLE)
     set_target_properties(
-      exec
+      ${base}
       PROPERTIES
         LINK_FLAGS             "-undefined dynamic_lookup"
     )
