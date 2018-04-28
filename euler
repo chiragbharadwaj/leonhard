@@ -8,7 +8,7 @@ bin="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/bin"
 version="1.0-beta"
 
 # Total number of problems in Project Euler so far.
-num=617
+num=615
 
 # Print out the help message with information about flags/options.
 print_options () {
@@ -81,7 +81,7 @@ solved() {
   echo -e "┐"
 
   rows=$((($num+$wrap-1)/$wrap))
-  maxcol=$(($num - $wrap * ($rows - 1) + 1))
+  maxcol=$(($num-$wrap*($rows-1)+1))
 
   for ((p = 0; p < "$rows"; p++)); do
 
@@ -106,12 +106,14 @@ solved() {
 
         completed=false
 
-        for prob in "${problems[@]}"; do
-          if [ "$n" -eq "$prob" ]; then
-            completed=true
-            break
-          fi
-        done
+        if [ "${#problems[@]}" -ne 0 ]; then
+          for prob in "${problems[@]}"; do
+            if [ "$n" -eq "$prob" ]; then
+              completed=true
+              break
+            fi
+          done
+        fi
 
         if [ "$completed" = true ]; then
           echo -n -e "·"
