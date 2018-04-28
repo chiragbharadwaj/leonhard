@@ -2,7 +2,13 @@
 
 # Absolute path to the binary directory, so that it can be accessed anywhere.
 #   Source: https://stackoverflow.com/questions/59895/
-bin="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/bin"
+src="${BASH_SOURCE[0]}"
+while [ -h "$src" ]; do
+  bin="$(cd -P "$(dirname "$src")" && pwd)"
+  src="$(readlink "$src")"
+  [[ $src != /* ]] && src="$bin/$src"
+done
+bin="$(cd -P "$(dirname "$src")" && pwd)/bin"
 
 # Versioning information.
 version="1.0-beta"
@@ -18,27 +24,34 @@ where possible options include:
   --help                     Print a synopsis of standard options
   -v, --version              Version information
   -r, --run                  Run and print the answer to <problem number>
-  -s, --solved               List all of the problems solved so far"
+  -s, --run-solved           Run and print answers to all solved problems so far
+  -l, --list-solved          List all of the problems solved so far"
   exit 0
 }
 
 # Print out the version message and licensing information.
 print_version () {
   echo -e "euler $version"
-  exit 0
 }
 
 # Run the specified problem.
 run() {
-  if [ -f "$bin/$1" ]; then
-    "$bin/$1"
-  else
-    echo -e "This problem has not been solved yet."
-  fi
+  problems=("$@")
+  for prob in "${problems[@]}"; do
+    if [ "$prob" -eq 0 ] || [ "$prob" -gt "$num" ]; then
+      echo -e "Problem $prob is not a problem on Project Euler."
+    else
+      if [ -f "$bin/$prob" ]; then
+        "$bin/$prob"
+      else
+        echo -e "Problem $prob: This problem has not been solved yet."
+      fi
+    fi
+  done
 }
 
 # List all of the problems solved so far in a nice table format.
-solved() {
+listSolved() {
   tcols=$(tput cols)
   wrap=$((($tcols - 5)/4))
 
@@ -180,12 +193,24 @@ solved() {
   done
 }
 
+# Run all of the solved problems so far.
+runSolved() {
+  for file in $bin/*; do
+    base=$(basename $file)
+    if [ "$base" -ne 0 ]; then
+      run "$base"
+    fi
+  done
+}
+
 # Initialization of arguments that may be fed to the CLI.
-#   -run:    Whether or not the run option was specified.
-#   -solved: Whether or not the solved option was specified.
+#   -run: Whether or not the run option was specified.
+#   -lst: Whether or not the list-solved option was specified.
+#   -rs:  Whether or not the run-solved option was specified.
 run=0
-solved=0
-args=""
+lst=0
+rs=0
+args=()
 
 # Reading the arguments to the CLI and interpreting them using a shift parser.
 while true; do
@@ -205,8 +230,12 @@ while true; do
       run=1
       shift
       ;;
-    --solved|-s)
-      solved=1
+    --run-solved|-s)
+      rs=1
+      shift
+      ;;
+    --list-solved|-l)
+      lst=1
       shift
       ;;
     *)
@@ -216,40 +245,39 @@ while true; do
         echo -e "use --help for a list of possible options"
         exit 1
       else
-        if [ "$args" != "" ]; then
-          echo -e "euler: too many problems specified: $1"
-          echo -e "Already running $args..."
-          echo -e "Usage: euler <options> <problem number>"
-          echo -e "use --help for a list of possible options"
-        exit 1
-        else
-          args="$1"
-          shift
-        fi
+        args+=("$1")
+        shift
       fi
       ;;
   esac
 done
 
 # If problems were given, run the command. Otherwise, print help.
-if [ "$run" -eq 1 ] && [ "$args" = "" ]; then
+if [ "$run" -eq 1 ] && [ "${#args[@]}" -eq 0 ]; then
   echo "No problems to run were specified."
   print_options
+  exit 1
 else
   # No options specified. Default behavior is temporary until compiler is done.
-  if [ "$run" -ne 1 ] && [ "$solved" -ne 1 ]; then
+  if [ "$run" -ne 1 ] && [ "$lst" -ne 1 ] && [ "$rs" -ne 1 ]; then
     echo -e "euler: no options specified."
     echo -e "Usage: euler <options> <problem number>"
     echo -e "use --help for a list of possible options"
     exit 1
   else
+    # Print out the list of solved problems.
+    if [ "$lst" -eq 1 ]; then
+      listSolved
+      exit 0
+    fi
+    # Run all of the solved problems so far.
+    if [ "$rs" -eq 1 ]; then
+      runSolved
+      exit 0
+    fi
     # Run the specified problem.
     if [ "$run" -eq 1 ]; then
-      run "$args"
-    fi
-    # Print out the list of solved problems.
-    if [ "$solved" -eq 1 ]; then
-      solved
+      run "${args[@]}"
     fi
   fi
 fi

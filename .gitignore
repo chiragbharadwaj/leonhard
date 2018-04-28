@@ -5,6 +5,12 @@ Thumbs.db
 # Project files
 bin/*
 
+# Build files
+*.ninja*
+*.cmake
+CMakeCache.txt
+*CMakefiles/*
+
 # Prerequisites
 *.d
 
