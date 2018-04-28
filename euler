@@ -1,0 +1,253 @@
+#!/bin/bash
+
+# Absolute path to the binary directory, so that it can be accessed anywhere.
+#   Source: https://stackoverflow.com/questions/59895/
+bin="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/bin"
+
+# Versioning information.
+version="1.0-beta"
+
+# Total number of problems in Project Euler so far.
+num=617
+
+# Print out the help message with information about flags/options.
+print_options () {
+  echo -e \
+"Usage: euler <options> <problem number>
+where possible options include:
+  --help                     Print a synopsis of standard options
+  -v, --version              Version information
+  -r, --run                  Run and print the answer to <problem number>
+  -s, --solved               List all of the problems solved so far"
+  exit 0
+}
+
+# Print out the version message and licensing information.
+print_version () {
+  echo -e "euler $version"
+  exit 0
+}
+
+# Run the specified problem.
+run() {
+  if [ -f "$bin/$1" ]; then
+    "$bin/$1"
+  else
+    echo -e "This problem has not been solved yet."
+  fi
+}
+
+# List all of the problems solved so far in a nice table format.
+solved() {
+  tcols=$(tput cols)
+  wrap=$((($tcols - 5)/4))
+
+  problems=()
+  for file in $bin/*; do
+    base=$(basename $file)
+    problems+=("$base")
+  done
+
+  echo -e "List of solved problems:  (p = ${wrap}r + c)"
+  echo -e ""
+
+  min=$([ "$num" -lt "$wrap" ] && echo "$num" || echo "$wrap")
+
+  for ((i = 0; i < "$min"; i++)); do
+    if [ "$i" -eq 0 ]; then
+      echo -n -e "     "
+    else
+      echo -n -e " "
+    fi
+    if [ "$i" -lt 10 ]; then
+      echo -n -e "00$i"
+    else
+      echo -n -e "0$i"
+    fi
+  done
+  echo -e ""
+
+  for ((i = 0; i < "$min"; i++)); do
+    if [ "$i" -eq 0 ]; then
+      echo -n -e "    "
+      continue
+    elif [ "$i" -eq 1 ]; then
+      echo -n -e "    ┌"
+    else
+      echo -n -e "┬"
+    fi
+    echo -n -e "───"
+  done
+  echo -e "┐"
+
+  rows=$((($num+$wrap-1)/$wrap))
+  maxcol=$(($num - $wrap * ($rows - 1) + 1))
+
+  for ((p = 0; p < "$rows"; p++)); do
+
+    if [ "$p" -lt 10 ]; then
+      echo -n -e " 0$p "
+    else
+      echo -n -e " $p "
+    fi
+
+    for ((q = 0; q < "$wrap"; q++)); do
+
+      n=$(($wrap * $p + $q))
+
+      if [ "$n" -eq "$num" ]; then
+        q=$(($wrap - 1))
+      fi
+
+      if [ "$p" -eq 0 ] && [ "$q" -eq 0 ]; then
+        echo -n -e "    "
+      else
+        echo -n -e "│ "
+
+        completed=false
+
+        for prob in "${problems[@]}"; do
+          if [ "$n" -eq "$prob" ]; then
+            completed=true
+            break
+          fi
+        done
+
+        if [ "$completed" = true ]; then
+          echo -n -e "·"
+        else
+          echo -n -e " "
+        fi
+        
+        echo -n -e " "
+      fi
+    done
+
+    echo -e "│"
+
+    for ((q = 0; q < "$wrap"; q++)); do
+
+      n=$(($wrap * $p + $q))
+
+      if [ "$n" -eq "$num" ]; then
+        q=$(($wrap - 1))
+      fi
+
+      if [ "$rows" -eq 1 ]; then
+        if [ "$q" -eq 0 ]; then
+          echo -n -e "        "
+        elif [ "$q" -eq 1 ]; then
+          echo -n -e "└───"
+        else
+          echo -n -e "┴───"
+        fi
+      elif [ "$p" -eq $(($rows - 1)) ]; then
+        if [ "$q" -eq 0 ]; then
+          echo -n -e "    └───"
+        else
+          echo -n -e "┴───"
+        fi
+      elif [ "$p" -eq $(($rows - 2)) ] && [ "$q" -gt "$maxcol" ]; then
+        echo -n -e "┴───"
+      elif [ "$p" -eq 0 ]; then
+        if [ "$q" -eq 0 ]; then
+          echo -n -e "    ┌───"
+        else
+          echo -n -e "┼───"
+        fi
+      else
+        if [ "$q" -eq 0 ]; then
+          echo -n -e "    ├───"
+        else
+          echo -n -e "┼───"
+        fi
+      fi
+    done
+
+    if [ "$rows" -eq 1 ]; then
+      echo -e "┘"
+    elif [ "$p" -eq $(($rows - 1)) ]; then
+      echo -e "┘"
+    elif [ "$p" -eq $(($rows - 2)) ] && [ "$q" -gt "$maxcol" ]; then
+      echo -e "┘"
+    elif [ "$p" -eq 0 ]; then
+      echo -e "┤"
+    else
+      echo -e "┤"
+    fi
+  done
+}
+
+# Initialization of arguments that may be fed to the CLI.
+#   -run:    Whether or not the run option was specified.
+#   -solved: Whether or not the solved option was specified.
+run=0
+solved=0
+args=""
+
+# Reading the arguments to the CLI and interpreting them using a shift parser.
+while true; do
+  case "$1" in
+    "")
+      break
+      ;;
+    --help)
+      print_options
+      exit 0
+      ;;
+    --version|-v)
+      print_version
+      exit 0
+      ;;
+    --run|-r)
+      run=1
+      shift
+      ;;
+    --solved|-s)
+      solved=1
+      shift
+      ;;
+    *)
+      if [[ "$1" == -* ]]; then
+        echo -e "euler: invalid flag: $1"
+        echo -e "Usage: euler <options> <problem number>"
+        echo -e "use --help for a list of possible options"
+        exit 1
+      else
+        if [ "$args" != "" ]; then
+          echo -e "euler: too many problems specified: $1"
+          echo -e "Already running $args..."
+          echo -e "Usage: euler <options> <problem number>"
+          echo -e "use --help for a list of possible options"
+        exit 1
+        else
+          args="$1"
+          shift
+        fi
+      fi
+      ;;
+  esac
+done
+
+# If problems were given, run the command. Otherwise, print help.
+if [ "$run" -eq 1 ] && [ "$args" = "" ]; then
+  echo "No problems to run were specified."
+  print_options
+else
+  # No options specified. Default behavior is temporary until compiler is done.
+  if [ "$run" -ne 1 ] && [ "$solved" -ne 1 ]; then
+    echo -e "euler: no options specified."
+    echo -e "Usage: euler <options> <problem number>"
+    echo -e "use --help for a list of possible options"
+    exit 1
+  else
+    # Run the specified problem.
+    if [ "$run" -eq 1 ]; then
+      run "$args"
+    fi
+    # Print out the list of solved problems.
+    if [ "$solved" -eq 1 ]; then
+      solved
+    fi
+  fi
+fi
