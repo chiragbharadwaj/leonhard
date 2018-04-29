@@ -11,7 +11,10 @@ file(GLOB_RECURSE SOURCES "*.cpp")
 foreach(problem ${SOURCES})
   # Create a base file name out of the source file.
   get_filename_component(base ${problem} NAME_WE)
-  string(REGEX REPLACE "euler-" "" base "${base}")
+  string(REGEX REPLACE "Euler-" "" base "${base}")
+
+  # Add in the utility classes as needed for each source file.
+  include_directories("${CMAKE_SOURCE_DIR}/utils")
 
   # Create a run-time executable based on these source files from above.
   add_executable(${base} ${problem})

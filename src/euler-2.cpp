@@ -14,13 +14,13 @@ static std::map<const long, const long> table = {{0,1},{1,1}};
  * @param n: The index within the Fibonacci sequence to discover.
  * @return The number at the specified index in the Fibonacci sequence.
  */
-static const long getFibonacci(const long n) {
+static const long fibonacci(const long n) {
   if (table.find(n) != table.end()) {
     return table[n];
   } else {
     auto k = (n % 2 == 0) ? ((n+1)/2) : (n/2); // Cut it in half
-    auto a = getFibonacci(k);
-    auto b = getFibonacci(k-1);
+    auto a = fibonacci(k);
+    auto b = fibonacci(k-1);
 
     auto result = (n % 2 == 0) ? (a*a + b*b) : (a*a + 2*a*b);
     table.insert({n,result});
@@ -40,7 +40,7 @@ static const long sumEvenFibonacci(const long limit) {
   int n = 0;
 
   long fib;
-  while ((fib = getFibonacci(n++)) < limit) {
+  while ((fib = fibonacci(n++)) < limit) {
     if (fib % 2 == 0) {
       sum = sum + fib;
     }
