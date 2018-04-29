@@ -6,7 +6,7 @@
 #include <iostream>
 
 // Pull in the defined utility classes/functions needed to simplify the problem.
-#include "CircularList.h"
+#include "LinkedList.h"
 
 /* The primary execution block of the program.
  *
