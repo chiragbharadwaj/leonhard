@@ -19,11 +19,11 @@ private:
     explicit Node() = delete;
 
     explicit Node(const N &data)
-      : data(data), next(nullptr) { }
+      : data(&data), next(nullptr) { }
 
     ~Node() = default;
 
-    N data;
+    const N *data;
     Node *next;
   };
 
@@ -109,22 +109,6 @@ public:
     return const_iterator();
   }
 
-  T &front() {
-    return head->data;
-  }
-
-  const T &front() const {
-    return head->data;
-  }
-
-  T &back() {
-    return tail->data;
-  }
-
-  const T &back() const {
-    return tail->data;
-  }
-
   bool empty() const {
     return (numElems == 0);
   }
@@ -156,13 +140,24 @@ public:
     numElems++;
   }
 
-  const T pop() {
+  const T *pop() {
     if (!empty()) {
       const auto val = head->data;
       auto next = head->next;
       delete head;
       head = next;
       numElems--;
+      return val;
+    } else {
+      return nullptr;
+    }
+  }
+
+  const T *unsafe_pop() {
+    if (!empty()) {
+      const auto val = head->data;
+      auto next = head->next;
+      head = next;
       return val;
     } else {
       return nullptr;
