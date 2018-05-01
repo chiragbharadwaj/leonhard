@@ -1,42 +1,54 @@
 // Pull in some standard data structures and collection-handling headers.
 #include <list>
-#include <algorithm>
+#include <vector>
 
 // Pull in the IO stream-handling headers.
 #include <iostream>
 
 // Pull in the defined utility classes/functions needed to simplify the problem.
-#include "LinkedList.h"
+#include "Wheel12357.h"
 
+// Avoid having to preface utility class names.
 using namespace utils;
 
-LinkedList<int> generateWheel() {
-  LinkedList<int> primary({1, 2, 2, 4});
-  LinkedList<int> secondary({2, 4, 2, 4, 6, 2, 6, 4, 2, 4, 6, 6, 2, 6, 4, 2,
-                             6, 4, 6, 8, 4, 2, 4, 2, 4, 8, 6, 4, 6, 2, 4, 6,
-                             2, 6, 6, 4, 2, 4, 6, 2, 6, 4, 2, 4, 2,10, 2,10});
-  secondary.join(secondary);
-  primary.join(secondary);
-  return primary;
-}
-
-std::list<int> getFactors(LinkedList<int> &wheel, const std::list<int> &lst, int pot, long num) {
+/* Non-visible to public.
+ *
+ * Helper function to compute the prime factors of an integer by testing a
+ *   potential candidate via a skip-based 4-spoke wheel factorization method.
+ *
+ * @param wheel: A 1-2-3-5-7 wheel needed for the 4-spoke wheel factorization.
+ * @param lst: A list containing the prime factors determined so far.
+ * @param pot: A potential candidate for a prime factor of the number.
+ * @param num: The integer for which the prime factors must be determined.
+ * @return A list containing all of the prime factors of the number.
+ */
+std::list<long> factorHelper(Wheel12357 &wheel, std::list<long> &lst, long pot, long num) {
   if (pot * pot > num) {
-    std::list<int> newlst(lst);
-    newlst.push_front(num);
-    newlst.reverse();
-    return newlst;
+    lst.push_back(num);
+    lst.reverse();
+    return lst;
   } else {
-    int div = num / pot;
+    long div = num / pot;
     if (div * pot == num) {
-      std::list<int> newlst(lst);
-      newlst.push_front(pot);
-      return getFactors(wheel, newlst, pot, div);
+      lst.push_back(pot);
+      return factorHelper(wheel, lst, pot, div);
     } else {
-      const int head = *(wheel.unsafe_pop());
-      return getFactors(wheel, lst, (pot+head), num);
+      const int head = wheel.rotate();
+      return factorHelper(wheel, lst, (pot+head), num);
     }
   }
+}
+
+/* Finds all of the prime factors of an integer. 1 is not a prime number.
+ *
+ * @param num: The integer for which the prime factors must be determined.
+ * @return A list containing all of the prime factors of the number.
+ */
+static std::list<long> getPrimeFactors(long num) {
+  auto wheel = Wheel12357();
+  std::list<long> lst = { };
+
+  return factorHelper(wheel, lst, 2, num); // Call helper with constructed args
 }
 
 /* The primary execution block of the program.
@@ -47,11 +59,11 @@ std::list<int> getFactors(LinkedList<int> &wheel, const std::list<int> &lst, int
  */
 int main(int argc, char *argv[]) {
 
-  LinkedList<int> wheel = generateWheel();
+  // Get all of the prime factors
+  auto factors = getPrimeFactors(600'851'475'143L);
 
-  std::list<int> factors = getFactors(wheel, { }, 2, 600'851'475'143L);
-
-  int maxFactor = 0;
+  // Find the largest prime factor
+  long maxFactor = 0;
   for (auto &factor : factors) {
     if (factor > maxFactor) {
       maxFactor = factor;
