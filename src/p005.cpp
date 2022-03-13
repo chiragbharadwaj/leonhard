@@ -60,6 +60,6 @@ int main(int argc, char *argv[]) {
 
   auto palindrome = findSmallestMultiple(20);
 
-  std::cout << "Problem 4: " << palindrome << "\n";
+  std::cout << "Problem 5: " << palindrome << "\n";
   return 0;
 }

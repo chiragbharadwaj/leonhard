@@ -48,7 +48,7 @@ static std::list<long> getPrimeFactors(long num) {
   auto wheel = Wheel12357();
   std::list<long> lst = { };
 
-  return factorHelper(wheel, lst, 2, num); // Call helper with constructed args
+  return factorHelper(wheel, lst, 2, num);
 }
 
 /* The primary execution block of the program.

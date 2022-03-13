@@ -18,7 +18,7 @@ static const long fibonacci(const long n) {
   if (table.find(n) != table.end()) {
     return table[n];
   } else {
-    auto k = (n % 2 == 0) ? ((n+1)/2) : (n/2); // Cut it in half
+    auto k = (n % 2 == 0) ? ((n+1)/2) : (n/2);
     auto a = fibonacci(k);
     auto b = fibonacci(k-1);
 
