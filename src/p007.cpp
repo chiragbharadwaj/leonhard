@@ -28,7 +28,7 @@ static const long getOrderedPrime(const long n) {
  */
 int main(int argc, char *argv[]) {
 
-  auto prime = getOrderedPrime(10001);
+  auto prime = getOrderedPrime(10'001);
 
   std::cout << "Problem 7: " << prime << "\n";
   return 0;

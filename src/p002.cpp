@@ -33,7 +33,6 @@ static const long fibonacci(const long n) {
  * @return The sum of the discovered Fibonacci numbers.
  */
 static const long sumEvenFibonacci(const long limit) {
-
   long sum = 0;
   int n = 0;
 

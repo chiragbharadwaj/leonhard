@@ -13,34 +13,34 @@ using namespace utils;
 
 /* Non-visible to public.
  *
- * Computes the prime factors of num by testing a candidate pot via a skip-based 4-spoke wheel factorization method.
+ * Computes the prime factors of n by testing a candidate pot via a skip-based 4-spoke wheel factorization method.
  *
  * @param wheel: A 1-2-3-5-7 wheel needed for the 4-spoke wheel factorization.
  * @param lst: A list containing the prime factors determined so far.
- * @param pot: A potential candidate for a prime factor of the number.
- * @param num: The integer for which the prime factors must be determined.
- * @return A list containing all of the prime factors of the number.
+ * @param pot: A potential candidate for a prime factor of n.
+ * @param n: The integer for which the prime factors must be determined.
+ * @return A list containing all of the prime factors of n.
  */
-const std::list<long> factorize(Wheel12357 &wheel, std::list<long> &lst, const long pot, const long num) {
-  if (pot * pot > num) {
-    lst.push_back(num);
+const std::list<long> factorize(Wheel12357 &wheel, std::list<long> &lst, const long pot, const long n) {
+  if (pot * pot > n) {
+    lst.push_back(n);
     lst.reverse();
     return lst;
   } else {
-    long div = num / pot;
-    if (div * pot == num) {
+    long div = n / pot;
+    if (div*pot == n) {
       lst.push_back(pot);
       return factorize(wheel, lst, pot, div);
     } else {
       const int head = wheel.rotate();
-      return factorize(wheel, lst, (pot+head), num);
+      return factorize(wheel, lst, (pot+head), n);
     }
   }
 }
 
 /* Finds all of the prime factors of n. 1 is not a prime number.
  *
- * @param num: The integer for which the prime factors must be determined.
+ * @param n: The integer for which the prime factors must be determined.
  * @return A list containing all of the prime factors of the number.
  */
 static const std::list<long> getPrimeFactors(const long n) {
