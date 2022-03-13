@@ -1,9 +1,8 @@
 // Pull in the IO stream-handling headers.
 #include <iostream>
 
-/* Finds the difference between the square of the sum of the first n positive integers and the sum
- *   of the squares of the first n natural numbers. In other words, computes S - T, where S and T
- *   are defined as the following sums:
+/* Finds the difference between the square of the sum of the first n positive integers and the sum of the squares of
+ *   the first n natural numbers. In other words, computes S - T, where S and T are defined as the following sums:
  *     S = (sum[k=0, n, k])^2  and  T = sum[k=0, n, k^2].
  *
  * @param n: The upper bound of each sum.

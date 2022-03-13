@@ -13,8 +13,7 @@ using namespace utils;
 
 /* Non-visible to public.
  *
- * Helper function to compute the prime factors of an integer by testing a
- *   potential candidate via a skip-based 4-spoke wheel factorization method.
+ * Computes the prime factors of num by testing a candidate pot via a skip-based 4-spoke wheel factorization method.
  *
  * @param wheel: A 1-2-3-5-7 wheel needed for the 4-spoke wheel factorization.
  * @param lst: A list containing the prime factors determined so far.
@@ -22,7 +21,7 @@ using namespace utils;
  * @param num: The integer for which the prime factors must be determined.
  * @return A list containing all of the prime factors of the number.
  */
-std::list<long> factorHelper(Wheel12357 &wheel, std::list<long> &lst, long pot, long num) {
+const std::list<long> factorize(Wheel12357 &wheel, std::list<long> &lst, const long pot, const long num) {
   if (pot * pot > num) {
     lst.push_back(num);
     lst.reverse();
@@ -31,24 +30,24 @@ std::list<long> factorHelper(Wheel12357 &wheel, std::list<long> &lst, long pot, 
     long div = num / pot;
     if (div * pot == num) {
       lst.push_back(pot);
-      return factorHelper(wheel, lst, pot, div);
+      return factorize(wheel, lst, pot, div);
     } else {
       const int head = wheel.rotate();
-      return factorHelper(wheel, lst, (pot+head), num);
+      return factorize(wheel, lst, (pot+head), num);
     }
   }
 }
 
-/* Finds all of the prime factors of an integer. 1 is not a prime number.
+/* Finds all of the prime factors of n. 1 is not a prime number.
  *
  * @param num: The integer for which the prime factors must be determined.
  * @return A list containing all of the prime factors of the number.
  */
-static std::list<long> getPrimeFactors(long num) {
+static const std::list<long> getPrimeFactors(const long n) {
   auto wheel = Wheel12357();
   std::list<long> lst = { };
 
-  return factorHelper(wheel, lst, 2, num);
+  return factorize(wheel, lst, 2, n);
 }
 
 /* The primary execution block of the program.

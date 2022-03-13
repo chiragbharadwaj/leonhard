@@ -4,9 +4,7 @@
 // Pull in the IO stream-handling headers.
 #include <iostream>
 
-/* A look-up table for the memoized version of Fibonacci numbers. Initialized
- *   with the base-case values for F(0) = F(1) = 1.
- */
+/* A look-up table for the Fibonacci numbers. Initialized with the base cases of F(0) = F(1) = 1. */
 static std::map<const long, const long> table = {{0,1},{1,1}};
 
 /* Finds the nth Fibonacci number, 0-indexed. We use F(0) = F(1) = 1 as bases.
