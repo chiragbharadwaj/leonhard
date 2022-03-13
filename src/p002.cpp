@@ -9,7 +9,7 @@
  */
 static std::map<const long, const long> table = {{0,1},{1,1}};
 
-/* Returns the nth Fibonacci number, 0-indexed. We use F(0) = F(1) = 1 as bases.
+/* Finds the nth Fibonacci number, 0-indexed. We use F(0) = F(1) = 1 as bases.
  *
  * @param n: The index within the Fibonacci sequence to discover.
  * @return The number at the specified index in the Fibonacci sequence.

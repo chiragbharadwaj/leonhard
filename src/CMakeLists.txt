@@ -11,7 +11,7 @@ file(GLOB_RECURSE SOURCES "*.cpp")
 foreach(problem ${SOURCES})
   # Create a base file name out of the source file.
   get_filename_component(base ${problem} NAME_WE)
-  string(REGEX REPLACE "Euler-" "" base "${base}")
+  string(REGEX REPLACE "p" "" base "${base}")
 
   # Add in the utility classes as needed for each source file.
   include_directories("${CMAKE_SOURCE_DIR}/utils")
@@ -19,24 +19,14 @@ foreach(problem ${SOURCES})
   # Create a run-time executable based on these source files from above.
   add_executable(${base} ${problem})
 
-  # Use C++14 to compile the source file.
+  # Use C++17 to compile the source file.
   # Also build the .o executable file without any prefixes (e.g. 'bin').
   set_target_properties(
     ${base}
     PROPERTIES
-      COMPILE_FLAGS            "-std=c++14 -O3"
+      COMPILE_FLAGS            "-std=c++17 -O3"
       PREFIX                   ""
       RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin"
       OUTPUT_NAME              "${base}"
   )
-
-  # Get proper shared-library behavior (where symbols are not necessarily
-  # resolved when the shared library is linked) on Mac OS X.
-  if (APPLE)
-    set_target_properties(
-      ${base}
-      PROPERTIES
-        LINK_FLAGS             "-undefined dynamic_lookup"
-    )
-  endif (APPLE)
 endforeach(problem)
